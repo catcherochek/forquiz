@@ -14,6 +14,10 @@ class CacheStore implements CacheInterface{
             $this->storage = $storage;
         }
        
+        
+        if (!file_exists($this->storage)) {
+        	mkdir($this->storage, 0777);
+        }
         if(!is_writable($this->storage)) {
             die('Cache folder ('.$this->storage.') need to be 777 permissions');
         }

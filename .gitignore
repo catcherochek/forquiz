@@ -1,6 +1,6 @@
 /vendor
+/storage
 .buildpath
-
 .idea/
 .project
 .git/

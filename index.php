@@ -25,7 +25,7 @@ if (isset($_GET['stage'])){
 		$cs = new CacheStore();
 		$res = $cs->get('val');
 		if ($res){
-			echo "Cache time doesn't expired, retrieving data from cache";
+			echo "Cache time doesn't expired, retrieving data from cache <br/> ".(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"])."s";
 			$result = $res;
 		}
 		else{
@@ -54,7 +54,7 @@ if (isset($_GET['stage'])){
 			
 			$response = $client->post('https://api.printful.com/shipping/rates',['headers' => $headers, 'body' => $body]);
 			$result =json_decode((string)$response->getBody()->getContents(),true);
-			echo "retrieving data from server, putting  data to cache";
+			echo "retrieving data from server, putting  data to cache <br/> ".(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"])."s";
 			$cs->set('val',$result,300);
 		}
 		
