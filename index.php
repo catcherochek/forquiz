@@ -30,6 +30,7 @@ if (isset($_GET['stage'])){
 		}
 		else{
 			$client = new GuzzleHttp\Client();
+			
 			$headers = [
 					'cache-control' => 'no-cache',
 					'Content-Type' => 'application/json',
