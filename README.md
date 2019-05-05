@@ -53,8 +53,12 @@ go into 'quiz' directory and put in command line to resolve composer dependencie
 
 **composer install**
 
-## start :
 ***
+
+## start :
+
+***
+
 Navigate index.php with your  web server http://localhost/pathtoquiz/index.php
 
 
