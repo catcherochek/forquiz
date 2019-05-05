@@ -2,19 +2,15 @@
 require('CacheInterface.php');
 define('DS', DIRECTORY_SEPARATOR);
 class CacheStore implements CacheInterface{
-	private  $ci;
-    public $storage = '';
+	public $storage = '';
     
     public function __construct($storage='') {
         if(!$storage) {
-        	// 
-            $this->storage = ".".DS.'storage' . DS;
+        	$this->storage = ".".DS.'storage' . DS;
         } else {
-            // 
             $this->storage = $storage;
         }
-       
-        
+               
         if (!file_exists($this->storage)) {
         	mkdir($this->storage, 0777);
         }
@@ -24,9 +20,6 @@ class CacheStore implements CacheInterface{
     }
     
     public function __destruct() {
-        /*
-         * 
-         */
         $cached_files = glob($this->storage . '*');
         if(count($cached_files)) {
             foreach($cached_files as $filename) {
@@ -37,21 +30,21 @@ class CacheStore implements CacheInterface{
         }
     }
     
-    public function save($cache_key, $source, $minutes=0) {
-        /*
-         * ���������� ���-�����
-         */
+    protected function save($cache_key, $source, $minutes=0) {
         $cache_filename = md5($cache_key);
         $Open = fopen($this->storage . $cache_filename, 'w');
         $final_source = "TIME=". ($minutes * 60) ."\n". $source;
         fwrite($Open, $final_source);
         return $source;
     }
-    
-    public function has($cache_key) {
-        /*
-         * �������� �� ������������� � ������������ ���-�����
-         */
+
+    /**
+     * check if file with that filename exists in store dir
+     *
+     * @param $cache_key
+     * @return bool
+     */
+    protected function has($cache_key) {
         $cache_filename = $this->storage . md5($cache_key);
         if(!file_exists($cache_filename)) {
             return False;
@@ -60,11 +53,17 @@ class CacheStore implements CacheInterface{
              return $this->is_actual($cache_filename);
          }
     }
-    
-    public function view($cache_key, $source='', $time=0) {
-        /*
-         * �������� ������������ ���-����� � ����������� �������������
-         */
+
+    /**
+     *Retrieves a value from file in store directory
+     *
+     * @param $cache_key
+     * @param string $source
+     * @param int $time
+     * @return string|string[]|null
+     */
+    protected function view($cache_key, $source='', $time=0) {
+
         $cache_filename = $this->storage . md5($cache_key);
         if($this->has($cache_key)) {
             $Source = file_get_contents($cache_filename);
@@ -79,19 +78,24 @@ class CacheStore implements CacheInterface{
               }
          }
     }
-    
-    public function forget($cache_key) {
-        /*
-         * �������� ���-����� �� ��� �����
-         */
+
+    /**
+     * Deletes a file
+     * @param $cache_key
+     * @return bool
+     */
+    protected function forget($cache_key) {
+
         $cache_filename = $this->storage . md5($cache_key);
         return $this->delete($cache_filename);
     }
-    
-    private function delete($filename) {
-        /*
-         * �������� ���-����� ����� ��� ����
-         */
+
+    /**
+     * @param $filename
+     * @return bool
+     */
+    protected function delete($filename) {
+
         if(file_exists($filename)) {
             return unlink($filename);
         }
@@ -99,11 +103,12 @@ class CacheStore implements CacheInterface{
              return True;
          }
     }
-    
-    public function is_actual($filename) {
-        /*
-         * �������� �� ������������ ���-�����
-         */
+
+    /** Check if cache file is actual, retrieves file creation and compare it with  TTL
+     * @param $filename
+     * @return bool
+     */
+    protected function is_actual($filename) {
         $Source = file_get_contents($filename);
         preg_match("#TIME=(\d+)#", $Source, $matches);
         if( (filemtime($filename) + $matches[1]) < time() ) {
@@ -114,9 +119,24 @@ class CacheStore implements CacheInterface{
             return True;
          }
     }
+
+    /** Interface implementation, allowing only mixed and generic values
+     * @param string $key
+     * @param mixed $value
+     * @param int $duration
+     * @return bool|mixed
+     */
     public function set(string $key, $value, int $duration){
+    	if (in_array(gettype($value),array('unknown type','NULL','object'))){
+    		return false;
+    	}
     	return $this->save($key,json_encode($value),$duration/60);
     }
+
+    /** Interface implementation, retrieveing data from cache
+     * @param string $key
+     * @return mixed|null
+     */
     public function get(string $key){
     	return json_decode($this->view($key),true);
     }
@@ -124,17 +144,3 @@ class CacheStore implements CacheInterface{
     
 }
 
-Class SimpleWorker {
-	private $register;
-	public function __construct(CacheInterface $Ci, $storage='') {
-		$this->register = $Ci;
-	}
-		public function dowork(){
-			$res = $this->register->get("mykey");
-			return  ($res)?$this->register->get("mykey"):$this->register->set('mykey','Я был сохранен ' . date('Y-m-d H:i:s'),600);
-		}
-	
-	
-}
-
-?>

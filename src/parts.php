@@ -1,6 +1,10 @@
-<?php 
+<?php
 
-function LoginForm($params){
+/**
+ * @param $params
+ * @return string
+ */
+function SubmitForm($params){
 	error_reporting(E_ERROR | E_PARSE);
 $out = "";	
 	if (defined('CSS_PATH')){
