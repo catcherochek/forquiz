@@ -9,6 +9,7 @@ class ApiService{
     private $cacheService;
     public function __construct(CacheInterface $ci)
     {
+        //registering CacheInterface in a Service (according to a task in quiz)
         $this->cacheInterface = $ci;
     }
     public function Submit(){
@@ -31,15 +32,15 @@ class ApiService{
         //2nd part of a script, getting data
         $result = '';
         $out = '';
-
+        //TTL cache validation
         $res = $this->cacheInterface->get('result');
 
-        //cache validation
+
 
         if ($res){
 
-            //if TTL for the cache is valid, retrieving data from cache
-
+            //if cache TTL is valid, retrieving data from cache
+            //information string
             $out .= "Cache time doesn't expired, retrieving data from cache <br/> script time: ".
                 sprintf("%01.5f", (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]))."s";
             $result = $res;
@@ -74,9 +75,10 @@ class ApiService{
             //retrieving data from API server
             $response = $client->post('https://api.printful.com/shipping/rates',['headers' => $headers, 'body' => $body]);
             $result =json_decode((string)$response->getBody()->getContents(),true);
+            //information string
             $out .= "retrieving data from server, adding  data to cache <br/> script time: ".
                 sprintf("%01.5f", (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]))."s";
-            //saving data to cache, duration is 5*60 = 300s
+            //saving data to cache, duration is 5*60 = 300s(according to a task quiz)
             $this->cacheInterface->set('result',$result,300);
         }
 
