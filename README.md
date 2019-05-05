@@ -1,6 +1,8 @@
 ### quiz 
 ***
-install : in command line
+## install : 
+***
+# in command line**
 
 **git clone https://github.com/catcherochek/forquiz.git**
 ***
@@ -8,5 +10,8 @@ go into 'quiz' directory and put in command line to resolve composer dependencie
 
 **composer install**
 
+## start :
+***
+Navigate index.php with your  web server http://localhost/pathtoquiz/index.php
 
 
